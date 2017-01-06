@@ -38,7 +38,7 @@ In request header specify mayor release in the format yyyy-dd-mm
 
 ```
 	Content-Type: application/json
-	Stripe-Version: 2016-07-06
+	API-Version: 2016-07-06
 ```
 
 ##  Error codes
