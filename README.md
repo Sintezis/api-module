@@ -2,11 +2,12 @@
 
 ## HTTP Requests used
 
-+ `[GET]`
-+ `[POST]`
-+ `[PUT]`
-+ `[PATCH]`
-+ `[DELETE]`
++ `[GET]` - records list, or specific record
++ `[POST]` - create new record
++ `[PUT]` - update record
++ `[PATCH]` - partially update record
++ `[DELETE]` - delete record
+
 
 > Use records names in plurals when creating API url
 
@@ -32,7 +33,7 @@
 
 Specify in API url the version of the API you want to connect 
 
-`GET http://api.server.com/v1/users
+`GET http://api.server.com/v1/users`
 
 In request header specify mayor release in the format yyyy-dd-mm
 
