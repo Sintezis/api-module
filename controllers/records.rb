@@ -4,6 +4,7 @@
 # - expand(boolean) -> expand to json child relations
 # - embed(boolean) -> embed record in parent record
 
+
 class RecordsController < Sinatra::Base
 	enable :method_override
 	helpers Sinatra::ApiRequestHelper 
