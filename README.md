@@ -5,7 +5,6 @@
 + `[GET]` - records list, or specific record
 + `[POST]` - create new record
 + `[PUT]` - update record
-+ `[PATCH]` - partially update record
 + `[DELETE]` - delete record
 
 
@@ -17,7 +16,6 @@
 + `[GET]    /records/:id`
 + `[POST]   /records/`
 + `[PUT]    /records/:id`
-+ `[PATCH]  /records/:id`
 + `[DELETE] /records/:id`
 
 ## CRUD Requests for record relations
@@ -26,7 +24,6 @@
 + `[GET]    /records/:id/sub-records/:id`
 + `[POST]   /records/:id/sub-records`
 + `[PUT]    /records/:id/sub-records/:id`
-+ `[PATCH]  /records/:id/sub-records/:id`
 + `[DELETE] /records/:id/sub-records/:id`
 
 ## Versioning

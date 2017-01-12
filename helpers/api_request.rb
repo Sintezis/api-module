@@ -11,7 +11,15 @@ module Sinatra
 			end
 			{:request => request, :params => params, :json_body => body}
 		end
+
+		def valid_request?
+			request.media_type == 'application/json'
+		end
 		
+		def record_id
+			api_request[:params][:id]
+		end
+
 		def model_name
 			api_request[:params][:model].capitalize[0...-1]
 		end
@@ -24,8 +32,16 @@ module Sinatra
 			Object.const_get(model_name)
 		end
 
-		def child_model_name
+		def child_record_id
+			api_request[:params][:id]
+		end
+
+		def child_model_method
 			api_request[:params][:child_model]
+		end
+
+		def child_model_name
+			api_request[:params][:child_model].capitalize[0...-1]
 		end
 
 		def valid_child_model?
@@ -34,11 +50,6 @@ module Sinatra
 
 		def child_model
 			Object.const_get(child_model_name)
-		end
-
-
-		def valid_request?
-			request.media_type == 'application/json'
 		end
 
 		def api_error code
