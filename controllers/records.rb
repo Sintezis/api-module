@@ -4,7 +4,6 @@
 # - expand(boolean) -> expand to json child relations
 # - embed(boolean) -> embed record in parent record
 
-
 class RecordsController < Sinatra::Base
 	enable :method_override
 	helpers Sinatra::ApiRequestHelper 
@@ -59,7 +58,7 @@ class RecordsController < Sinatra::Base
 		new_record.to_json
 	end
 
-	# #Updating 
+	#Updating 
 	put '/:model/:id' do
 		halt(api_error 1008) unless valid_model?
 		record ||= model.get(record_id) || halt(api_error 1001)
@@ -77,7 +76,7 @@ class RecordsController < Sinatra::Base
 		record.to_json
 	end
 
-	# #Deleting
+	#Deleting
 	delete '/:model/:id' do
 		halt(api_error 1008) unless valid_model?
 		record ||= model.get(record_id) || halt(api_error 1001)
