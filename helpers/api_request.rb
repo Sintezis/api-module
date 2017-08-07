@@ -1,7 +1,7 @@
 require 'sinatra/base'
 
 module Sinatra
-	module ApiRequestHelper
+	module ApiHelpers
 		
 		class APIManager
 			attr_accessor :table, :child_table, :join_table
@@ -10,8 +10,8 @@ module Sinatra
 				@request = request
 				@params = params
 				@table = TableManager.new @params[:table], @params[:id] unless @params[:table].nil?
-				@child_table = TableManager.new @params[:child_model], @params[:child_id] unless @params[:child_model].nil?
-				@join_table = TableManager.new @params[:join_model], @params[:join_id] unless @params[:join_model].nil?
+				@child_table = TableManager.new @params[:child_table], @params[:child_id] unless @params[:child_table].nil?
+				@join_table = TableManager.new @params[:join_table], @params[:join_id] unless @params[:join_table].nil?
 			end
 
 			def json_body
@@ -34,7 +34,7 @@ module Sinatra
 		end
 		
 		class TableManager
-			attr_accessor :table_name, :model_name, :id
+			attr_accessor :name, :model_name, :id
 
 			def initialize requested_table, record_id
 				@name = requested_table
@@ -107,6 +107,6 @@ module Sinatra
 	
 	end
 	
-	helpers ApiRequestHelper
+	helpers ApiHelpers
 
 end

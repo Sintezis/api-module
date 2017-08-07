@@ -4,7 +4,7 @@
 
 class RecordsController < Sinatra::Base
 	enable :method_override
-	helpers Sinatra::ApiRequestHelper 
+	helpers Sinatra::ApiHelpers
 
 	before do
 		content_type :json
@@ -23,15 +23,15 @@ class RecordsController < Sinatra::Base
 		@api_manager = APIManager.new request, params
 		api_error(1001) unless @api_manager.table.valid?
 		record ||= @api_manager.table.model.get(@api_manager.table.id) || api_error(1002)
-		api_manager.respond :with => record
+		@api_manager.respond :with => record
 	end
 	
 	get '/:table/:id/:child_table' do
 		@api_manager = APIManager.new request, params
 		api_error(1001) unless @api_manager.table.valid? && @api_manager.child_table.valid?
 		parent_record ||= @api_manager.table.model.get(@api_manager.table.id) || api_error(1002)
-		records ||= parent_record.send @api_manager.child_table.name || api_error(1002)
-		api_manager.respond :with => records
+		records ||= parent_record.send(@api_manager.child_table.name) || api_error(1002)
+		@api_manager.respond :with => records
 	end
 	
 	get '/:table/:id/:child_table/:child_id' do
@@ -46,7 +46,7 @@ class RecordsController < Sinatra::Base
 		@api_manager = APIManager.new request, params
 		api_error(1001) unless @api_manager.table.valid? && @api_manager.child_table.valid? && @api_manager.join_table.valid?
 		parent_record ||= @api_manager.table.model.get(record_id) || api_error(1002)
-		records ||= parent_record.send(@api_manager.join_table.name).get@api_manager.join_table.id).send(@api_manager.child_table.name) || api_error(1002)
+		records ||= parent_record.send(@api_manager.join_table.name).get(@api_manager.join_table.id).send(@api_manager.child_table.name) || api_error(1002)
 		@api_manager.respond :with => records
 	end
 
