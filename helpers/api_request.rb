@@ -38,7 +38,8 @@ module Sinatra
 
 			def initialize requested_table, record_id
 				@name = requested_table
-				@model_name = @name.capitalize[0...-1]
+				@model_name = @name.capitalize if Object.const_defined? @name.capitalize
+				@model_name = @name.capitalize[0...-1] if Object.const_defined? @name.capitalize[0...-1] 
 				@id ||= record_id
 			end
 
@@ -49,6 +50,15 @@ module Sinatra
 			def model
 				Object.const_get @model_name
 			end
+
+			def all_records
+				model.all()
+			end
+
+			def get_record
+				model.get(@id)
+			end
+
 
 			def relationships
 				methods = []
@@ -76,15 +86,7 @@ module Sinatra
 				},
 				{
 					:code => 1004,
-					:msg => "Record not deleted. Requested record can not be found."
-				},
-				{
-					:code => 1006,
-					:msg => "Invalid email and password combination."
-				},
-				{
-					:code => 1009,
-					:msg => "Invalid recovery code."
+					:msg => "Record not deleted. Error while deleting record."
 				}
 			]
 

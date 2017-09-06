@@ -1,6 +1,7 @@
 # TODO: add request flags
-# - envelope(boolean) -> if true wraps data in 'data' envelope
+# - Add errors for missing relation methods or properties
 # - page, per_page(varchar) -> paging for large data sets
+# - add delete requests for all table data (and many-to-many relations, singular)
 
 class RecordsController < Sinatra::Base
 	enable :method_override
@@ -38,14 +39,14 @@ class RecordsController < Sinatra::Base
 		@api_manager = APIManager.new request, params
 		api_error(1001) unless @api_manager.table.valid? && @api_manager.child_table.valid?
 		parent_record ||= @api_manager.table.model.get(@api_manager.table.id) || api_error(1002)
-		record ||= parent_record.send(child_model_method).get(child_id) || halt(api_error 1002)
+		record ||= parent_record.send(@api_manager.child_table.name).get(@api_manager.child_table.id) || api_error(1002)
 		@api_manager.respond :with => record
 	end
 
 	get '/:table/:id/:join_table/:join_id/:child_table' do
 		@api_manager = APIManager.new request, params
 		api_error(1001) unless @api_manager.table.valid? && @api_manager.child_table.valid? && @api_manager.join_table.valid?
-		parent_record ||= @api_manager.table.model.get(record_id) || api_error(1002)
+		parent_record ||= @api_manager.table.model.get(@api_manager.table.id) || api_error(1002)
 		records ||= parent_record.send(@api_manager.join_table.name).get(@api_manager.join_table.id).send(@api_manager.child_table.name) || api_error(1002)
 		@api_manager.respond :with => records
 	end
@@ -53,8 +54,9 @@ class RecordsController < Sinatra::Base
 	get '/:table/:id/:join_table/:join_id/:child_table/:child_id' do
 		@api_manager = APIManager.new request, params
 		api_error(1001) unless @api_manager.table.valid? && @api_manager.child_table.valid? && @api_manager.join_table.valid?
-		parent_record ||= @api_manager.table.model.get(record_id) || api_error(1002)
-		record ||= parent_record.send(@api_manager.join_table.name).get(@api_manager.join_table.id).send(@api_manager.child_table.name).get(@api_manager.child_table.id) || api_error(1002)
+		parent_record ||= @api_manager.table.model.get(@api_manager.table.id) || api_error(1002)
+		join_record ||= parent_record.send(@api_manager.join_table.name).get(@api_manager.join_table.id) || api_error(1002)
+		record ||= join_record.send(@api_manager.child_table.name).get(@api_manager.child_table.id) || api_error(1002)
 		@api_manager.respond :with => record
 	end
 
@@ -122,12 +124,27 @@ class RecordsController < Sinatra::Base
 	end
 
 	#Deleting
+	delete '/:table' do
+		@api_manager = APIManager.new request, params
+		api_error(1001) unless @api_manager.table.valid?
+		api_error(1004) unless @api_manager.table.model.all().destroy
+		@api_manager.respond :with => {:deleted => true}
+	end
+
 	delete '/:table/:id' do
 		@api_manager = APIManager.new request, params
 		api_error(1001) unless @api_manager.table.valid?
 		record ||= @api_manager.table.model.get(@api_manager.table.id) || api_error(1002)
 		api_error(1004) unless record.destroy
-		{:deleted => true}.to_json
+		@api_manager.respond :with => {:deleted => true}
+	end
+
+	delete '/:table/:id/:child_table' do
+		@api_manager = APIManager.new request, params
+		api_error(1001) unless @api_manager.table.valid? && @api_manager.child_table.valid?
+		parent_record ||= @api_manager.table.model.get(@api_manager.table.id) || api_error(1002)
+		api_error(1004) unless parent_record.send(@api_manager.child_table.name).all().destroy
+		@api_manager.respond :with => {:deleted => true}
 	end
 	
 	delete '/:table/:id/:child_table/:child_id' do
@@ -136,9 +153,18 @@ class RecordsController < Sinatra::Base
 		parent_record ||= @api_manager.table.model.get(@api_manager.table.id) || api_error(1002)
 		record ||= parent_record.send(@api_manager.child_table.name).get(@api_manager.child_table.id)
 		api_error(1004) unless record.destroy
-		{:deleted => true}.to_json
+		@api_manager.respond :with => {:deleted => true}
 	end
-
+	
+	delete '/:table/:id/:join_table/:join_id/:child_table/' do
+		@api_manager = APIManager.new request, params
+		api_error(1001) unless @api_manager.table.valid? && @api_manager.child_table.valid? && @api_manager.join_table.valid?
+		parent_record ||= @api_manager.table.model.get(@api_manager.table.id) || api_error(1002)
+		join_record ||= parent_record.send(@api_manager.join_table.name).get(@api_manager.join_table.id) || api_error(1002)
+		api_error(1004) unless join_record.send(@api_manager.child_table.name).all().destroy
+		@api_manager.respond :with => {:deleted => true}
+	end
+	
 	delete '/:table/:id/:join_table/:join_id/:child_table/:child_id' do
 		@api_manager = APIManager.new request, params
 		api_error(1001) unless @api_manager.table.valid? && @api_manager.child_table.valid? && @api_manager.join_table.valid?
@@ -146,7 +172,7 @@ class RecordsController < Sinatra::Base
 		join_record ||= parent_record.send(@api_manager.join_table.name).get(@api_manager.join_table.id) || api_error(1002)
 		record ||= join_record.send(@api_manager.child_table.name).get(@api_manager.child_table.id) || api_error(1002)
 		api_error(1004) unless record.destroy
-		{:deleted => true}.to_json
+		@api_manager.respond :with => {:deleted => true}
 	end
 
 end
